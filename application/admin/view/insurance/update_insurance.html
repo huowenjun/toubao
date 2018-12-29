@@ -1,0 +1,65 @@
+<div class="content-hd">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>修改服务大类</legend>
+    </fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+    <form class="layui-form layui-form-pane" action="" lay-filter="example">
+        <input type="hidden" name="pkid" value="<?php echo $list['id']; ?>">
+        <input type="hidden" name="beName" value="<?php echo $list['i_name']; ?>">
+        <div class="layui-form-item">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><i class="required-color">*</i>大类名称</label>
+                <div class="layui-input-inline">
+                    <input name="i_name" required="" lay-verify="required" placeholder="请输入大类名称" autocomplete="off"
+                           class="layui-input" type="text" value="<?php echo $list['i_name']; ?>">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <textarea class="layui-textarea" id="content" style="display: none" name="i_info" lay-verify="i_info"><?php echo $list['i_info']; ?></textarea>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="ActUpInsurance">立即提交</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    var index,layedit;
+    layui.use(['form' , 'layedit'], function(){
+        layedit = layui.layedit;
+        layedit.set({
+            uploadImage: {
+                url: 'layUp'
+                ,type: 'post' //默认post
+                ,field: 'file'
+            }
+        });
+        index = layedit.build('content'); //建立编辑器
+        layui.form.on('submit(ActUpInsurance)', function (data) {
+            layedit.sync(index);
+            if($(data.form).serializeArray()[3].value == '')
+            {
+                layer.msg('文本不能为空', {time: 1500, anim: 6});
+                return false;
+            }
+            $.post(
+                "upInsurance",
+                $(data.form).serialize(),
+                function (obj) {
+                    if(obj.ret == 200){
+                        layer.msg(obj.msg, {time: 1500}, function(){
+                            window.location.reload();
+                        });
+                    }
+                    else{
+                        layer.msg(obj.msg, {time: 1500, anim: 6});
+                    }
+                }
+            );
+            return false;
+        });
+    });
+</script>

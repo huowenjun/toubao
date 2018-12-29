@@ -1,0 +1,23 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 霍文俊
+ * Date: 2018/12/13
+ * Time: 9:21
+ */
+
+namespace app\admin\controller;
+
+use app\admin\model\Goods as GoodsModel;
+class Goods extends Controller
+{
+
+    public function index()
+    {
+//        $model = new GoodsModel();
+//        $where = array();
+//        $list = $model->allList($where);
+//        return $this->fetch('index', ['list'=>$list]);
+        return $this->fetch('index');
+    }
+}

@@ -1,0 +1,64 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>商品列表</legend>
+		<?php if(in_array(27, $role_operation_ids)): ?>
+		<div style="text-align: left;">
+			<a href="addGoods.html" class="layui-btn layui-btn-sm layui-btn-normal">增加商品</a>
+		</div>
+		<?php endif; ?>
+	</fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+	<table class="layui-table" >
+		<colgroup>
+			<col width="60">
+			<col width="120">
+			<col width="120">
+			<col width="120">
+			<col width="100">
+			<col width="150">
+			<col width="150">
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>门店名称</th>
+				<th>LOGO</th>
+				<th>门店电话</th>
+				<th>联系人</th>
+				<th>详细地址</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		</tbody>
+	</table>
+
+		<div style="text-align: left;"></div>
+
+</div>
+<script>
+function Del(pkid, beName)
+{
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		layer.confirm('你确定要删除吗？', {
+			btn: ['是','不'] //按钮
+		}, function(){
+			$.post(
+				'delStore',
+				{'pkid':pkid, 'beName':beName},
+				function(obj){
+					layer.msg(obj.msg, {time: 1500}, function(){
+						window.location.reload();
+					});
+				},
+				"json"
+			);
+		});
+	});
+}
+</script>

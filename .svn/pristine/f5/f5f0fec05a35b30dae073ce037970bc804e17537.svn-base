@@ -1,0 +1,21 @@
+<?php
+/**
+ * 实物卡
+ * User: 霍文俊
+ * Date: 2018/12/20
+ * Time: 15:58
+ */
+
+namespace app\admin\model;
+
+use think\Model;
+//use think\Request;
+//use traits\model\SoftDelete;
+
+class Card extends Model
+{
+    protected $name = 'card';
+    protected $pk = 'id';
+//    use SoftDelete;
+//    protected $deleteTime = 'delete_time';
+}

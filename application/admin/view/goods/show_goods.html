@@ -1,0 +1,98 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>商品详情</legend>
+	</fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+			
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>序列号</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['card']}" title="{$data['card']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>商品大类</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['i_id']}" title="{$data['i_id']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>商品名称</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['name']}" title="{$data['name']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>商品价格</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['price']}" title="{$data['price']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>手机型号</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['b_id']}" title="{$data['b_id']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>手机成色</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['condition']}" title="{$data['condition']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>服务条件</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text"  value="{$data['type']}" title="{$data['type']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>组合条件</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="<?php echo $data['type_t']!=0?$data['type_t']:'无'; ?>" title="{$data['type_t']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>服务次数</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['num']}" title="{$data['num']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>服务价格</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['prices']}" title="{$data['prices']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>是否激活</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" {if condition="$data['activation'] == 1"}value="是"{else /} value="否" {/if} readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>物料编码</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['code']}"  readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label" title="延保6个月费用"><i class="required-color">*</i>6个月费用</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['sixm']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label" title="延保9个月费用"><i class="required-color">*</i>9个月费用</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['ninem']}" readonly>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label" title="延保12个月费用"><i class="required-color">*</i>12个月费用</label>
+				<div class="layui-input-inline">
+					<input autocomplete="off" class="layui-input" type="text" value="{$data['twelvem']}" readonly>
+				</div>
+			</div>
+</div>

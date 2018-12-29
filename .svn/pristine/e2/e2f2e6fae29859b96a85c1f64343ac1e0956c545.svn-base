@@ -1,0 +1,97 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>修改</legend>
+	</fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+	<form class="layui-form layui-form-pane" action="" lay-filter="example">
+		<input type="hidden" name="pkid" value="<?php echo $list['id']; ?>">
+		<input type="hidden" name="beName" value="<?php echo $list['problem']; ?>">
+		<div class="layui-form-item">
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><i class="required-color">*</i>问题</label>
+				<div class="layui-input-block">
+					<textarea placeholder="请输入问题" required="required" lay-verify="problem" class="layui-textarea" name="problem" ><?php echo $list['problem']; ?></textarea>
+				</div>
+			</div>
+			<div class="layui-form-item layui-form-text">
+				<label class="layui-form-label"><i class="required-color">*</i>答案</label>
+				<div class="layui-input-block">
+					<textarea placeholder="请输入答案" required="required" lay-verify="answer" class="layui-textarea" name="answer" ><?php echo $list['answer']; ?></textarea>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>导航</label>
+				<div class="layui-input-block">
+					<select name="pid" lay-verify="required">
+						<option value=""></option>
+						<?php foreach($navList as $v): ?>
+							<option <?php if($v['id'] === $list['pid']): ?>selected<?php endif; ?> value="<?php echo $v['id']; ?>"><?php echo $v['nav']; ?></option>
+						<?php endforeach; ?>
+					</select>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>排序</label>
+				<div class="layui-input-inline">
+					<input required="required" lay-verify="px" placeholder="请输入排序" autocomplete="off" class="layui-input" type="number" name="px" value="<?php echo $list['px']; ?>">
+				</div>
+				<div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit="" lay-filter="ActUp">立即提交</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+		//自定义验证规则
+		form.verify({
+			problem: function(value){
+				if(value.length < 5){
+					return '问题至少得5个字符啊';
+				}
+				else if(value.length > 100){
+					return '问题不得大于100个字符啊';
+				}
+			}
+			,answer: function(value){
+				if(value.length < 5){
+					return '答案至少得5个字符啊';
+				}
+				else if(value.length > 100){
+					return '答案不得大于100个字符啊';
+				}
+			}
+			,px: function(value){
+				if(value < 0){
+					return '排序至少得大于0啊';
+				}
+				else if(value > 100){
+					return '排序不得大于100啊';
+				}
+			}
+		});
+        form.on('submit(ActUp)', function (data) {
+			$.post(
+				'upFaq',
+				data.field,
+				function(obj){
+					if(obj.ret == 200){
+						layer.msg(obj.msg, {time: 1500}, function(){
+							window.location.reload();
+						});
+					}
+					else{
+						layer.msg(obj.msg, {time: 1500, anim: 6});
+					}
+				}
+			);
+            return false;
+        });
+    });
+</script>

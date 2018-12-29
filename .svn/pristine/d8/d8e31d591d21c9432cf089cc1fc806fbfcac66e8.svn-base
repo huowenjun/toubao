@@ -1,0 +1,84 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>修改</legend>
+	</fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+	<form class="layui-form layui-form-pane" action="" lay-filter="example">
+		<input type="hidden" name="pkid" value="<?php echo $list['id']; ?>">
+		<input type="hidden" name="beName" value="<?php echo $list['brand'] . " " . $list['models'] . " " . $list['color'] . " " . $list['rom']; ?>">
+		<div class="layui-form-item">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>品牌</label>
+				<div class="layui-input-block">
+					<input name="brand" required="" lay-verify="required" placeholder="请输入品牌" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['brand']; ?>">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>型号</label>
+				<div class="layui-input-block">
+					<input name="models" required="" lay-verify="required" placeholder="请输入型号" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['models']; ?>">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>机身颜色</label>
+				<div class="layui-input-block">
+					<input name="color" required="" lay-verify="required" placeholder="请输入机身颜色" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['color']; ?>">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>内存容量</label>
+				<div class="layui-input-block">
+					<input name="rom" required="" lay-verify="required" placeholder="请输入内存容量" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['rom']; ?>">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><i class="required-color">*</i>排序</label>
+				<div class="layui-input-inline">
+					<input required="required" lay-verify="px" placeholder="请输入排序" autocomplete="off" class="layui-input" type="number" name="px" value="<?php echo $list['px']; ?>">
+				</div>
+				<div class="layui-form-mid layui-word-aux">数字越小越靠前</div>
+			</div>
+			
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit="" lay-filter="ActUp">立即提交</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+		//自定义验证规则
+		form.verify({
+			px: function(value){
+				if(value < 0){
+					return '排序至少得大于0啊';
+				}
+				else if(value > 100){
+					return '排序不得大于100啊';
+				}
+			}
+		});
+		
+        form.on('submit(ActUp)', function (data) {
+			$.post(
+				'upFormat',
+				data.field,
+				function(obj){
+					if(obj.ret == 200){
+						layer.msg(obj.msg, {time: 1500}, function(){
+							window.location.reload();
+						});
+					}
+					else{
+						layer.msg(obj.msg, {time: 1500, anim: 6});
+					}
+				}
+			);
+            return false;
+        });
+    });
+</script>

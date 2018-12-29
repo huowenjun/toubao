@@ -1,0 +1,57 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>系统信息</legend>
+	</fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px; background-color: #F2F2F2;">
+	<div class="layui-row layui-col-space15">
+		<div class="layui-col-md12">
+			<div class="layui-card">
+				<div class="layui-card-header">Web服务器环境</div>
+				<div class="layui-card-body">
+					<?php echo $server['webserver']; ?>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md4">
+			<div class="layui-card">
+				<div class="layui-card-header">服务器操作系统</div>
+				<div class="layui-card-body">
+					<?php echo $server['system']; ?>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md4">
+			<div class="layui-card">
+				<div class="layui-card-header">PHP版本</div>
+				<div class="layui-card-body">
+					<?php echo $server['php']; ?>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md4">
+			<div class="layui-card">
+				<div class="layui-card-header">MySQL版本</div>
+				<div class="layui-card-body">
+					<?php echo $server['mysql']; ?>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md4">
+			<div class="layui-card">
+				<div class="layui-card-header">最大执行时间</div>
+				<div class="layui-card-body">
+					<?php echo $server['max_execution_time']; ?>
+				</div>
+			</div>
+		</div>
+		<div class="layui-col-md4">
+			<div class="layui-card">
+				<div class="layui-card-header">文件上传限制</div>
+				<div class="layui-card-body">
+					<?php echo $server['upload_max']; ?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

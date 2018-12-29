@@ -1,0 +1,82 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>服务大类列表</legend>
+		<?php if(in_array(46, $role_operation_ids)): ?>
+		<div style="text-align: left;">
+			<a href="addInsurance.html" class="layui-btn layui-btn-sm layui-btn-normal">增加服务大类</a>
+		</div>
+		<?php endif; ?>
+	</fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+	<table class="layui-table" >
+		<colgroup>
+			<col width="60">
+			<col width="120">
+			<col width="120">
+			<col width="120">
+			<col width="100">
+			<col width="150">
+			<col width="150">
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>服务名称</th>
+				<th>服务描述</th>
+				<th>创建时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php if (!(empty($list->total()))): foreach ($list as $vo): ?>
+		<tr>
+			<td><?php echo $vo['id']; ?></td>
+			<td><?php echo $vo['i_name']; ?></td>
+			<td><?php echo $vo['i_info']; ?></td>
+			<td><?php echo $vo['ctime'] ? date("y-m-d H:i:s", $vo['ctime']) : ''; ?></td>
+			<td>
+				<?php if(in_array(48, $role_operation_ids)): ?>
+				<a class="rha-bt-a" href="upInsurance.html?id=<?php echo $vo['id']; ?>">修改</a>
+				<?php endif; ?>
+				<?php if(in_array(49, $role_operation_ids)): ?>
+				<a href="javascript:;" onclick="Del('<?php echo $vo['id']; ?>', '<?php echo $vo['i_name']; ?>')" class="rha-bt-a" >删除</a>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<?php endforeach; else: ?>
+		<tr>
+			<td colspan="8">暂无记录</td>
+		</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+
+	<?php if (!(empty($list))): ?>
+	<div style="text-align: left;"><?php echo $list->render(); ?></div>
+	<?php endif; ?>
+
+</div>
+<script>
+function Del(pkid, beName)
+{
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		layer.confirm('你确定要删除吗？', {
+			btn: ['是','不'] //按钮
+		}, function(){
+			$.post(
+				'delInsurance',
+				{'pkid':pkid, 'beName':beName},
+				function(obj){
+					layer.msg(obj.msg, {time: 1500}, function(){
+						window.location.reload();
+					});
+				},
+				"json"
+			);
+		});
+	});
+}
+</script>

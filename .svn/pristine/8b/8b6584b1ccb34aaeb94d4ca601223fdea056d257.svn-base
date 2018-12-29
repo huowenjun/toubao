@@ -1,0 +1,120 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>手机品牌</legend>
+		<?php if(in_array(54, $role_operation_ids)): ?>
+		<a href="AddBrand.html" class="layui-btn layui-btn-sm layui-btn-normal">增加品牌</a>
+		<?php endif; ?>
+		<div style="float:right;">
+		<?php if(in_array(55, $role_operation_ids)): ?>
+		<button type="button" class="layui-btn layui-btn-sm" id="Eximport">Excel回传</button>
+		<?php endif; ?>
+		<?php if(in_array(62, $role_operation_ids)): ?>
+		<a href="ExcelExport.html" class="layui-btn layui-btn-sm">Excel导出</a>
+		<?php endif; ?>
+		</div>
+	</fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+	<form class="layui-form" action="">
+		<div class="layui-col-md3">
+			<div class="layui-form-item">
+				<input type="text" name="name" placeholder="请输入手机品牌名称"
+					   value="<?php echo input('name'); ?>" class="layui-input">
+			</div>
+		</div>
+		<div class="layui-col-md1" style="margin-left: 5px;">
+			<button class="layui-btn layui-btn-primary" lay-submit lay-filter="formDemo">搜索</button>
+		</div>
+	</form>	
+	<table class="layui-table" >
+		<colgroup>
+			<col width="400">
+			<col width="300">
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>品牌</th>
+				<th>操作时间</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php if (!(empty($list->total()))): foreach ($list as $vo): ?>
+		<tr>
+			<td><?php echo $vo['name']; ?></td>
+			<td><?php echo $vo['utime'] ? date("Y-m-d H:i:s", $vo['utime']) : 0; ?></td>
+			<td>
+				<?php if(in_array(56, $role_operation_ids)): ?>
+				<a class="rha-bt-a" href="upBrand.html?id=<?php echo $vo['id']; ?>">修改</a>
+				<?php endif; ?>
+				<?php if(in_array(57, $role_operation_ids)): ?>
+					<a href="javascript:;" onclick="Del('<?php echo $vo['id']; ?>', '<?php echo $vo['name']; ?>')" class="rha-bt-a" >删除</a>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<?php endforeach; else: ?>
+		<tr>
+			<td colspan="3">暂无记录</td>
+		</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+	<?php if (!(empty($list))): ?>
+		<div style="text-align: left;"><?php echo $list->render(); ?></div>
+	<?php endif; ?>
+</div>
+<script>
+layui.use('upload', function(){
+	var upload = layui.upload;
+	var returnExcel = upload.render({
+		elem: '#Eximport' //指向容器选择器
+		,url: 'ExcelImport' //服务端上传接口
+		,accept: 'file' //指定允许上传时校验的文件类型
+		,field: 'excel' //设定文件域的字段名
+		,size: 20 * 1024 * 1024 //设置文件最大可允许上传的大小，单位 KB
+		,multiple: false //是否允许多文件上传
+		,number: 1 //设置同时可上传的文件数量
+		,before: function(obj){
+			layer.load(2, {shade: [1, '#FFF']});
+		}
+		,done: function(res){
+			layer.closeAll();
+			layer.msg(res.msg, {time: 1500}, function(){
+				if(res.error === 0){
+					window.location.reload();
+				}
+			});
+		}
+		,error: function(){
+			layer.closeAll();
+			layer.msg('系统发生错误', {time: 1500});
+		}
+	});
+});
+function Del(pkid, beName)
+{
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		layer.confirm('你确定要删除吗？', {
+			btn: ['是','不'] //按钮
+		}, function(){
+			$.post(
+				'delBrand',
+				{'pkid':pkid, 'beName':beName},
+				function(obj){
+					if(obj.ret === 200){
+						layer.msg(obj.msg, {time: 1500}, function(){
+							window.location.reload();
+						});
+					}
+					else{
+						layer.msg(obj.msg, {time: 1500});
+					}
+				},
+				"json"
+			);
+		});
+	});
+}
+</script>

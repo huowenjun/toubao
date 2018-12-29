@@ -1,0 +1,64 @@
+<div class="content-hd">
+    <fieldset class="layui-elem-field layui-field-title" >
+        <legend>生产实物卡</legend>
+    </fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+    <form class="layui-form layui-form-pane" action="" lay-filter="example">
+        <input name="beName" type="hidden" value="{$info.name}">
+        <input name="pkid" type="hidden" value="{$info.id}">
+        <div class="layui-form-item">
+            <div class="layui-form-item">
+                <label class="layui-form-label"><i class="required-color">*</i>实物卡名称</label>
+                <div class="layui-input-inline">
+                    <input readonly autocomplete="off" class="layui-input" type="text" value="{$info.name}">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><i class="required-color">*</i>数量</label>
+                <div class="layui-input-inline">
+                    <input name="num" required="" lay-verify="required" placeholder="请输入生产数量" autocomplete="off" class="layui-input" type="tel" maxlength="3">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><i class="required-color">*</i>生效时间</label>
+                <div class="layui-input-inline">
+                    <input name="s_time" required="" lay-verify="required" autocomplete="off" class="layui-input" type="date">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label"><i class="required-color">*</i>失效时间</label>
+                <div class="layui-input-inline">
+                    <input name="e_time" required="" lay-verify="required" autocomplete="off" class="layui-input" type="date">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="ActAddStore">立即提交</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use('form', function () {
+
+        layui.form.on('submit(ActAddStore)', function (data) {
+            $.post(
+                "addCard",
+                data.field,
+                function (obj) {
+                    if(obj.ret == 200){
+                        layer.msg(obj.msg, {time: 1500}, function(){
+                            window.location.reload();
+                        });
+                    }
+                    else{
+                        layer.msg(obj.msg, {time: 1500, anim: 6});
+                    }
+                }
+            );
+            return false;
+        });
+    });
+</script>

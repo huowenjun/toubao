@@ -1,0 +1,176 @@
+<?php
+namespace app\admin\controller;
+
+use app\admin\model\Brand as BrandModel;
+class Brand extends Controller
+{
+	// Excel导出
+	public function excel_export()
+	{
+		$this->add_SystemLog('手机品牌', 'Excel导出', '品牌');
+		$model = new BrandModel;
+		$allData = collection($model->all())->toArray();
+		// 导入PHPExcel类库
+		vendor('PHPExcel.PHPExcel');
+		// 创建PHPExcel对象
+		$PHPExcel = new \PHPExcel();
+		$PHPSheet = $PHPExcel->getActiveSheet();
+		$PHPSheet->setTitle("手机品牌");
+		$PHPSheet->setCellValue("A1","品牌序号")->setCellValue("B1","手机品牌");//表格数据
+		$k = 2;
+		foreach($allData as $v){
+			$PHPSheet->setCellValue("A".$k, $v['id'])->setCellValue("B".$k, $v['name']);//表格数据
+			$k++;
+		}
+		$PHPWriter = \PHPExcel_IOFactory::createWriter($PHPExcel,"Excel2007");
+		$time = date("ymdhis");
+		header('Content-Disposition: attachment;filename="手机品牌'.$time.'.xlsx"');
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		$PHPWriter->save("php://output");
+	}
+	// Excel回传
+	public function excel_import()
+	{
+		if ($this->request->file()) {
+			$config = [
+				'size' => 20 * 1024 * 1024,
+				'ext'  => 'xls,xlsx'
+			];
+			// $upload_path = str_replace('\\', '/', ROOT_PATH . 'public/excel');
+			$upPath = ROOT_PATH . 'public' . DS . 'excel';
+			$file = $this->request->file('excel');
+			$info = $file->validate($config)->move($upPath);
+			if($info){
+				$fileExts = $info->getExtension();//文件后缀
+				$filePath = ROOT_PATH . 'public' . DS . 'excel' . DS . $info->getSaveName();
+				// 导入PHPExcel类库
+				vendor('PHPExcel.PHPExcel');
+				// 创建PHPExcel对象
+				$PHPExcel = new \PHPExcel();
+				// 判断excel文件后缀
+				if($fileExts == 'xls'){
+					Vendor('PHPExcel.PHPExcel.Reader.Excel5');
+					$PHPReader = new \PHPExcel_Reader_Excel5();
+				}
+				else if($fileExts == 'xlsx'){
+					Vendor('PHPExcel.PHPExcel.Reader.Excel2007');
+					$PHPReader = new \PHPExcel_Reader_Excel2007();
+				}
+				// 载入文件
+				$PHPExcel = $PHPReader->load($filePath);
+				$allAry = $PHPExcel->getSheet(0)->toArray();
+				if($allAry[0][0] === '手机品牌'){
+					// 初始
+					$model = new BrandModel;
+					$addData = array();
+					$utime = time();
+					for($i=1; $i<count($allAry); $i++){
+						$addData[] = ['name'=>$allAry[$i][0], 'utime'=>$utime];
+					}
+					if($addData){
+						// 添加新获取的数据
+						$model->saveAll($addData);
+						$this->add_SystemLog('手机品牌', 'Excel回传', '品牌');
+					}
+					// 删除目录
+					$this->delDir(ROOT_PATH . 'public' . DS . 'excel');
+					$result = [
+						'error' => 0,
+						'msg' => '回传成功'
+					];
+				}
+				else{
+					$result = [
+						'error' => 1,
+						'msg' => '模板错误'
+					];
+				}
+			}
+			else{
+				$result = [
+					'error'   => 1,
+					'msg' => $file->getError()
+				];
+			}
+		}
+		else{
+			$result = [
+				'error' => 1,
+				'msg' => '请求失败'
+			];
+		}
+		return json($result);
+	}
+	// 手机品牌列表
+	public function brand_lists()
+	{
+		$where = array();
+		$get = $this->getData();
+		if(!empty($get['name'])) {
+            $where['name'] = ['like', $get['name'] . '%'];
+        }
+		$model = new BrandModel;
+		$list = $model->allList($where);
+		return $this->fetch('brand_lists', ['list'=>$list]);
+	}
+	// 添加手机品牌
+	public function add_brand()
+	{
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$model = new BrandModel;
+			$post['utime'] = time();
+			$r = $model->allowField(true)->save($post);
+			if($r){
+				$this->add_SystemLog('手机品牌', '增加', $post['name']);
+				return ['ret'=>200, 'msg'=>'操作成功'];
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'操作失败'];
+			}
+		}
+		else{
+			return $this->fetch();
+		}
+	}
+	// 修改手机品牌
+	public function up_brand()
+	{
+		$model = new BrandModel;
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$post['utime'] = time();
+			$r = $model->allowField(true)->save($post, ['id'=>$post['pkid']]);
+			if($r){
+				$contents = $post['name'] === $post['beName'] ? $post['name'] : $post['name']." (".$post['beName'].") ";
+				$this->add_SystemLog('手机品牌', '修改', $contents);
+				return ['ret'=>200, 'msg'=>'操作成功'];
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'操作失败'];
+			}
+		}
+		else{
+			$get = $this->getData();
+			$list = $model->get($get['id']);
+			return $this->fetch('up_brand', ['list'=>$list]);
+		}
+	}
+	// 删除手机品牌
+	public function del_brand()
+	{
+		if($this->request->isAjax()){
+			$model = new BrandModel;
+			$post = $this->postData();
+			$r = $model->destroy($post['pkid']);
+			if($r){
+				$this->add_SystemLog('手机品牌', '删除', $post['beName']);
+				return ['ret'=>200, 'msg'=>'删除成功'];
+			}
+			else{
+				return ['ret'=>200, 'msg'=>'删除失败'];
+			}
+		}
+	}
+	
+}

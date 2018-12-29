@@ -1,0 +1,109 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: 霍文俊
+ * Date: 2018/12/19
+ * Time: 17:53
+ */
+
+namespace app\admin\controller;
+
+
+use app\admin\model\Mel;
+use think\Log;
+use think\Request;
+use \app\admin\model\Product;
+use \app\admin\model\Brand;
+use \app\admin\model\Insurance;
+use \app\admin\model\Card as CardModel;
+
+class Card extends Controller
+{
+    public $condition = array(
+        1 => '新机',
+        2 => '二手机',
+    );
+    public function add_card()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();
+            $dataP = Product::field(['id as p_id', 'i_id', 'condition', 'name', 'price', 'b_id', 'type', 'type_t', 'num', 'prices'])->where(['id' => $post['pkid']])->find();
+            $data['ctime'] = time();
+            $data['i_id'] = Insurance::field(['i_name'])->where(['id' => $dataP['i_id']])->find()['i_name'];
+            $data['b_id'] = $this->dataB($dataP['b_id']);
+            $data['condition'] = $this->condition[$dataP['condition']];
+            $data['p_id'] = $dataP['p_id'];
+            $data['name'] = $dataP['name'];
+            $data['price'] = $dataP['price'];
+            $data['num'] = $dataP['num'];
+            $data['prices'] = $dataP['prices'];
+            if ($dataP['type'] == 3) {
+                $strT = '';
+                $typeTA = explode(',', $dataP['type_t']);
+                $typeC = config('type_3');
+                foreach ($typeTA as $v) {
+                    $strT .= $typeC[$v] . '/';
+                }
+                $data['type_t'] = $strT;
+            }
+            $data['type'] = config('product_type')[$dataP['type']];
+            $data['ctime'] = time();
+            $dataC = $this->cardI($post['num'],$post['pkid'],$data);
+            $cModel = new CardModel();
+            $r = $cModel->allowField(true)->saveAll($dataC);
+            if ($r) {
+                $this->add_SystemLog('实物卡', '增加', $post['num'].'张'.$post['beName']);
+                return ['ret' => 0, 'msg' => '操作成功'];
+            } else {
+                Log::write('实物卡添加失败' . $post['num'].'张'.$post['beName'] . DATE);
+                return ['ret' => 0, 'msg' => '操作失败'];
+            }
+        } else {
+            return ['ret' => 0, 'msg' => '请求失败'];
+        }
+    }
+
+    /**
+     * 序列号&密码
+     * $num 张数
+     * $f 产品配置ID
+     */
+    private function cardI($num, $f, $data=false)
+    {
+        $i = 100;
+        for ($j = 0; $j < $num; $j++) {
+            //序列号
+            $data['card'] = $idCard[] = $f . time() . ($i + $j);
+            $data['pwd'] = substr(base64_encode(mt_rand(1000000, 9999999) . $f), 0, 8);
+            $arrD[] = $data;
+        }
+        return $arrD;
+    }
+
+    /**
+     * 数据b_id处理
+     */
+    private function dataB($b_id)
+    {
+        $dName = '';
+        $b_id = explode(';', rtrim($b_id, ';'));
+        foreach ($b_id as $v) {
+            $b[] = intval($v[0]);
+        }
+        $b = implode(',', $b);
+        $mData = Mel::field(['id', 'brand_id', 'name'])->where('brand_id', 'in', $b)->select();
+        $bData = Brand::field(['id', 'name'])->where('id', 'in', $b)->select();
+        foreach ($bData as $key => $val) {
+            $dName .= $val['name'] . ':';
+            foreach ($mData as $k => $v) {
+                if ($val['id'] == $v['brand_id']) {
+                    $dName .= $v['name'] . '/';
+                }
+            }
+            $dName .= ',';
+        }
+
+        return $dName;
+    }
+
+}

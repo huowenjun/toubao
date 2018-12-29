@@ -1,0 +1,102 @@
+<?php
+namespace app\admin\controller;
+
+use app\admin\model\Faq as FaqModel;
+class Faq extends Controller
+{
+	// 常见问题列表
+	public function faq_lists()
+	{
+		$model = new FaqModel;
+		$list = $model->allList();
+		return $this->fetch('faq_lists', ['list'=>$list]);
+	}
+	// 添加
+	public function add_faq()
+	{
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$model = new FaqModel;
+			$post['ctime'] = time();
+			$r = $model->allowField(true)->save($post);
+			if($r){
+				$this->add_SystemLog('常见问题', '增加', $post['problem']);
+				return ['ret'=>200, 'msg'=>'操作成功'];
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'操作失败'];
+			}
+		}
+		else{
+			return $this->fetch();
+		}
+	}
+	// 编辑
+	public function up_faq()
+	{
+		$model = new FaqModel;
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$post['utime'] = time();
+			$r = $model->allowField(true)->save($post, ['id'=>$post['pkid']]);
+			if($r){
+				$contents = $post['problem'] === $post['beName'] ? $post['problem'] : $post['problem']." (".$post['beName'].") ";
+				$this->add_SystemLog('常见问题', '修改', $contents);
+				return ['ret'=>200, 'msg'=>'操作成功'];
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'操作失败'];
+			}
+		}
+		else{
+			$get = $this->getData();
+			$list = $model->get($get['id']);
+			return $this->fetch('up_faq', ['list'=>$list]);
+		}
+	}
+	// 删除
+	public function del_faq()
+	{
+		if($this->request->isAjax()){
+			$model = new FaqModel;
+			$post = $this->postData();
+			$data = $model->get($post['pkid']);
+			$r = $data->delete();
+			if($r){
+				$this->add_SystemLog('常见问题', '删除', $data['problem']);
+				return ['ret'=>200, 'msg'=>'删除成功'];
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'删除失败'];
+			}
+		}
+	}
+	
+	public function up_sort()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();
+			$is = 0;
+            foreach ($post as $k => $v) {
+                if (!empty($_v = explode('_', $k))) {
+					if($v >= 0){
+						$data[] = ['id' => $_v[0], 'px' => $v];
+					}
+					else{
+						$is = 1;
+						break;
+					}
+                }
+            }
+			if($is === 1){
+				return ['ret'=>0, 'msg' =>'请输入大于0排序'];
+			}
+			else{
+				$model = new FaqModel;
+				$model->saveAll($data);
+				$this->add_SystemLog('常见问题', '排序', '更新排序');
+				return ['ret'=>200, 'msg' =>'更新成功'];
+			}
+        }
+    }
+}

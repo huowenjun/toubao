@@ -1,0 +1,264 @@
+<div class="content-hd">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>修改产品配置</legend>
+    </fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+    <form class="layui-form layui-form-pane" action="" lay-filter="example">
+        <input type="hidden" name="pkid" value="<?php echo $data['list']['id']; ?>">
+        <input type="hidden" name="beName" value="<?php echo $data['list']['name']; ?>">
+        <div class="layui-form-item">
+            <div class="layui-tab layui-tab-card">
+                <ul class="layui-tab-title">
+                    <li class="layui-this">基本配置</li>
+                    <li>手机品牌型号</li>
+                    <li>服务规格</li>
+                </ul>
+                <div class="layui-tab-content" style="height: auto;">
+                    <div class="layui-tab-item layui-show">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><i class="required-color">*</i>服务大类</label>
+                            <div class="layui-input-inline">
+                                <select name="i_id" lay-verify="">
+                                    <option value="">请选择服务大类</option>
+                                    {if condition="isset($data['insData'])"}
+                                    {foreach $data['insData'] as $vo}
+                                    <option value="{$vo.id}" {if condition=" $vo.id == $data['list']['i_id']"} selected {/if}>{$vo.i_name}</option>
+                                    {/foreach}
+                                    {/if}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><i class="required-color">*</i>手机成色</label>
+                            <div class="layui-input-inline">
+                                <select name="condition" lay-verify="">
+                                    <option value="">请选择手机成色</option>
+                                    <option value="1" {if condition=" 1 == $data['list']['condition']"} selected {/if}>新机</option>
+                                    <option value="2" {if condition=" 2 == $data['list']['condition']"} selected {/if}>二手机</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><i class="required-color">*</i>产品名称</label>
+                            <div class="layui-input-inline">
+                                <input name="name" required="" lay-verify="required" placeholder="请输入产品名称" autocomplete="off" class="layui-input" type="text" maxlength="13" value="{$data['list']['name']}">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"><i class="required-color">*</i>产品价格</label>
+                            <div class="layui-input-inline">
+                                <input name="price" required="" lay-verify="required" placeholder="请输入产品价格" autocomplete="off" class="layui-input" type="text" maxlength="13" value="{$data['list']['price']}" >
+                            </div>
+                        </div>
+                    </div>
+                    <div class="layui-tab-item">
+                        {if condition="isset($data['broData'])"}
+                        <div class="layui-form-item">
+                            {foreach $data['broData'] as $vo}
+                            <label class="layui-form-label">*{$vo.name}:</label>
+                            <div class="layui-input-block">
+                                {foreach $vo['child'] as $k=>$child}
+                                <span style="padding-right: 20px">
+											<input type="checkbox" name="b_id[{$vo.id}][{$child.id}]" title="{$child.name}" value="{$child.id}" {if condition=" in_array($child.id,$data['list']['b_id'])"} checked {/if}>
+										</span>
+                                {/foreach}
+                            </div>
+                            <br>
+                            {/foreach}
+                        </div>
+                        {/if}
+                    </div>
+                    <div class="layui-tab-item">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                <i class="required-color">*</i>服务条件
+                            </label>
+                            <div class="layui-input-block">
+                                {if condition="isset($data['productType'])"}
+                                {foreach $data['productType'] as $k=>$vo}
+                                <input type="radio" name="type" value="{$k}" title="{$vo}" lay-filter="type" {if condition=" $k == $data['list']['type']"} checked {/if}>
+                                {/foreach}
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="layui-form-item" id="on1" {if condition=" $data['list']['type'] == 3"} style="display: none" {/if}>
+                            <label class="layui-form-label">
+                                <i class="required-color">*</i>服务次数
+                            </label>
+                            <div class="layui-input-inline">
+                                <select name="t_num" lay-verify="" id="t_num">
+                                    <option value="">请选择服务次数</option>
+                                        {for start="1" end="11"}
+                                        <option value="{$i}" {if condition=" $data['list']['type'] != 3 and $data['list']['num'] == $i"}  selected {/if}>{$i}</option>
+                                        {/for}
+                                </select>
+                            </div>
+                        </div>
+                    <div class="layui-form-item" id="on2" {if condition=" $data['list']['type'] == 3"} style="display: none" {/if}>
+                            <label class="layui-form-label"><i class="required-color">*</i>服务价格</label>
+                            <div class="layui-input-inline">
+                                <input name="t_price"  placeholder="请输入服务价格" autocomplete="off" class="layui-input" type="text" maxlength="13" id="t_price"  value="{if condition=" $data['list']['type'] != 3"} {$data['list']['prices']} {/if}">
+                            </div>
+                     </div>
+                        <!--点击组合后的dom元素start-->
+                        <div class="layui-form-item" id="on3" >
+                            <label class="layui-form-label" {if condition=" $data['list']['type'] != 3"} style="display: none" {/if}>
+                                <i class="required-color">*</i>组合条件
+                            </label>
+                            {foreach $data['type_3'] as $k=>$vo}
+                                <div class="layui-input-inline" {if condition=" $data['list']['type'] != 3"} style="display: none" {/if}>
+                                    <span style="padding-right: 20px">
+                                        <input type="checkbox" name="type_3[]" title="{$vo}" value="{$k}" lay-filter="type_3" class="type_3" {if condition=" in_array($k,$data['list']['type_t'])"} checked {/if}>
+                                    </span>
+                                </div>
+                            {/foreach}
+                        </div>
+
+                        <div class="layui-form-item" id="on4">
+                            {if condition=" $data['list']['type'] == 3"}
+                            {foreach $data['list']['num'] as $k=>$vo}
+                        <label class="layui-form-label" id="tl_{$k}" {if condition=" $data['list']['type'] != 3"} style="display: none" {/if}>
+                            <i class="required-color">*</i>服务次数
+                        </label>
+                        <div class="layui-input-inline" id="t_{$k}">
+                        <select name="num_{$k}" lay-verify="">
+                            <option value="">请选择服务次数</option>
+                            {for start="1" end="11"}
+                            <option value="{$i}" {if condition="$vo == $i"}  selected {/if}>{$i}</option>
+                            {/for}
+                        </select>
+                        </div>
+                            {/foreach}
+                            {/if}
+                        </div>
+                        <div class="layui-form-item" id="on5">
+                        {if condition=" $data['list']['type'] == 3"}
+                        {foreach $data['list']['prices'] as $k=>$vo}
+                        <label class="layui-form-label" id="pl_{$k}" {if condition=" $data['list']['type'] != 3"} style="display: none" {/if}>
+                        <i class="required-color">*</i>服务价格
+                        </label>
+                        <div class="layui-input-inline" id="p_{$k}">
+                        <input name="p_{$k}" placeholder="请输入服务价格" autocomplete="off" class="layui-input" type="text" maxlength="13" value="{$vo}">
+                        </div>
+                        {/foreach}
+                        {/if}
+                        </div>
+                        <!--end-->
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn" lay-submit="" lay-filter="ActUpProduct">立即提交</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use('form', function () {
+        layui.form.on('submit(ActUpProduct)', function (data) {
+            $.post(
+                "upProduct",
+                data.field,
+                function (obj) {
+                    if (obj.ret == 200) {
+                        layer.msg(obj.msg, {time: 1500}, function () {
+                            window.location.reload();
+                        });
+                    }
+                    else {
+                        layer.msg(obj.msg, {time: 1500, anim: 6});
+                    }
+                }
+            );
+            return false;
+        });
+        layui.form.on('radio(type)', function(data){
+            type = data.value; //得到被选中的值
+            if(type==3){
+                str = '';
+                str+='<label class="layui-form-label">'
+                str+='<i class="required-color">*</i>组合条件'
+                str+='</label>'
+                {if condition="isset($data['type_3'])"}
+                {foreach $data['type_3'] as $k=>$vo}
+                str+='<div class="layui-input-inline">';
+                str+='<span style="padding-right: 20px">';
+                str+='<input type="checkbox" name="type_3[]" title="{$vo}" value="{$k}" lay-filter="type_3" class="type_3">';
+                str+='</span>';
+                str+='</div>';
+                {/foreach}
+                    {/if}
+                        $('#t_num').val("");
+                        $('#t_price').val("");
+                        $('#on1').hide();
+                        $('#on2').hide();
+                        $('#on3').empty();
+                        $('#on4').empty();
+                        $('#on5').empty();
+                        $('#on3').append(str);
+                        layui.form.render();
+                    }else{
+                    $('#on3').empty();
+                    $('#on4').empty();
+                    $('#on5').empty();
+                    $('#on1').show();
+                    $('#on2').show();
+
+                }
+                });
+        layui.form.on('checkbox(type_3)', function(data){
+            type_v = data.value; //得到被选中的值
+            bool = data.elem.checked;//组合条件是否被选中，选中true，取消false
+            spCodesTemp = '';
+            $('.type_3:checked').each(function(i){
+                if(0==i){
+                    spCodesTemp = $(this).val();
+                }else{
+                    spCodesTemp =$(this).val();
+                }
+            });
+            if(spCodesTemp=='')
+            {
+                $('#on4').hide();
+                $('#on5').hide();
+            }
+            if(bool)
+            {
+                $('#on4').show();
+                $('#on5').show();
+                str = '';
+                str+='<label class="layui-form-label" id="tl_'+data.value+'">';
+                str+='<i class="required-color">*</i>服务次数';
+                str+='</label>';
+                str+='<div class="layui-input-inline" id="t_'+data.value+'">';
+                str+='<select name="num_'+data.value+'" lay-verify="">';
+                str+='<option value="">请选择'+$(this).attr('title')+'服务次数</option>';
+                for(var i=1; i<11; i++)
+                {
+                    str+='<option value="'+i+'">'+i+'</option>';
+                }
+                str+='</select>';
+                str+='</div>';
+                $('#on4').append(str);
+                str2 = '';
+                str2 += '<label class="layui-form-label" id="pl_'+data.value+'">';
+                str2 += '<i class="required-color">*</i>服务价格';
+                str2 += '</label>';
+                str2+='<div class="layui-input-inline" id="p_'+data.value+'">';
+                str2+='<input name="p_'+data.value+'" placeholder="请输入'+$(this).attr('title')+'价格" autocomplete="off" class="layui-input" type="text" maxlength="13">';
+                str2+='</div>';
+                $('#on5').append(str2);
+                layui.form.render();
+            }else{
+                $('#t_'+data.value).remove();
+                $('#p_'+data.value).remove();
+                $('#tl_'+data.value).remove();
+                $('#pl_'+data.value).remove();
+            }
+
+        });
+    });
+</script>

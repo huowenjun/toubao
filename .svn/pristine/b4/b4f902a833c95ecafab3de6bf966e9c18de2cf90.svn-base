@@ -1,0 +1,208 @@
+<?php
+namespace app\admin\controller;
+
+use think\Loader;
+use app\admin\model\Brand as BrandModel;
+class Upload extends Controller
+{
+    private $config;	
+	/**
+     * 图片上传接口
+     */
+    public function upimages()
+    {
+		if ($this->request->file()) {
+			$config = [
+				'size' => 20 * 1024 * 1024,
+				'ext'  => 'jpg,png,jpeg'
+			];
+			$file = $this->request->file('file');
+			// $upload_path = str_replace('\\', '/', ROOT_PATH . 'public/uploads');
+			$upPath = ROOT_PATH . 'public' . DS . 'uploads';
+			$info = $file->validate($config)->move($upPath);
+			if($info){
+				$save_path   = '/uploads/';
+				$result = [
+					'error' => 0,
+					'url' => str_replace('\\', '/', $save_path . $info->getSaveName())
+				];
+			}
+			else{
+				$result = [
+					'error' => 1,
+					'msg' => $file->getError()
+				];
+			}
+		}
+		else{
+			$result = [
+				'error' => 1,
+				'msg' => '请求失败'
+			];
+		}
+        return json($result);
+    }
+	/**
+     * Excel上传接口
+     */
+	public function upexcels()
+	{
+		if ($this->request->file()) {
+			$config = [
+				'size' => 20 * 1024 * 1024,
+				'ext'  => 'xls,xlsx'
+			];
+			// $upload_path = str_replace('\\', '/', ROOT_PATH . 'public/excel');
+			$upPath = ROOT_PATH . 'public' . DS . 'excel';
+			$file = $this->request->file('excel');
+			$info = $file->validate($config)->move($upPath);
+			if($info){
+				$fileExts = $info->getExtension();//文件后缀
+				// $filePath = str_replace('\\', '/', ROOT_PATH . '/public/excel/' . $info->getSaveName());//文件路径
+				$filePath = ROOT_PATH . 'public' . DS . 'excel' . DS . $info->getSaveName();
+				// 导入PHPExcel类库
+				vendor('PHPExcel.PHPExcel');
+				// 创建PHPExcel对象
+				$PHPExcel = new \PHPExcel();
+				// 判断excel文件后缀
+				if($fileExts == 'xls'){
+					Vendor('PHPExcel.PHPExcel.Reader.Excel5');
+					$PHPReader = new \PHPExcel_Reader_Excel5();
+				}
+				else if($fileExts == 'xlsx'){
+					Vendor('PHPExcel.PHPExcel.Reader.Excel2007');
+					$PHPReader = new \PHPExcel_Reader_Excel2007();
+				}
+				// 载入文件
+				$PHPExcel = $PHPReader->load($filePath);
+				$allAry = $PHPExcel->getSheet(0)->toArray();
+				$tAry = array();
+				for($t=1; $t<count($allAry); $t++){
+					for($tt=0; $tt<count($allAry[$t]); $tt++){
+						$tAry[$t][] = $allAry[$t][$tt];
+					}
+				}
+				
+				return json($tAry);
+				
+				for($i=1; $PHPExcel->sheets[0]['numRows']; $i++){
+					for($j=1; $j<=$PHPExcel->sheets[0]['numCols']; $j++){
+						if(trim($PHPExcel->sheets[0]['cells'][$i][$j]) ==""){
+							for($k=$i-1;$k>=0;$k--){
+								if(trim($PHPExcel->sheets[0]['cells'][$k][$j])!=""){
+									$PHPExcel->sheets[0]['cells'][$i][$j] = $PHPExcel->sheets[0]['cells'][$k][$j];
+									break;
+								}
+							}
+						}
+					}
+				}
+				return json($PHPExcel);
+				// 初始
+				$model = new BrandModel;
+				$allData = collection($model->all())->toArray();		
+				$addData = array();
+				$utime = time();
+				foreach($tAry as $k1=>$v1){
+					foreach($v1 as $k2=>$v2){
+						if($v2){
+							$v = $k1 === 0 ? 1 : 2;
+							$pname = $v === 2 ? $tAry[0][$k2] : '';
+							$is = true;
+							if($allData){
+								foreach($allData as $k3=>$v3){
+									if($v3['v'] == $v && $v3['name'] == $v2 && $v3['pname'] == $pname){
+										$is = false;
+										break;
+									}
+								}
+							}
+							if($is){
+								$addData[] = ['v'=>$v, 'name'=>$v2, 'pname'=>$pname, 'utime'=>$utime];
+							}
+						}
+					}
+				}
+				if($addData){
+					// 添加新获取的数据
+					$model->saveAll($addData);
+				}
+				$allDatas = collection($model->all())->toArray();
+				$v1All = array();
+				$v2All = array();
+				foreach($allDatas as $v4){
+					if($v4['v'] === 1){
+						$v1All[$v4['name']] = $v4['id'];
+					}
+					if($v4['v'] === 2 && $v4['pid'] === 0){
+						$v2All[] = ['id'=>$v4['id'], 'pid'=>$v4['pid'], 'pname'=>$v4['pname']];
+					}
+				}
+				$uData = array();
+				foreach($v2All as $v5){
+					$uData[] = ['id'=>$v5['id'], 'pid'=>$v1All[$v5['pname']]];
+				}
+				if($uData){
+					$model->saveAll($uData);
+				}
+				// 删除目录
+				$this->delDir(ROOT_PATH . 'public' . DS . 'excel');
+				$result = [
+					'error' => 0,
+					'msg' => '回传成功'
+				];
+			}
+			else{
+				$result = [
+					'error'   => 1,
+					'msg' => $file->getError()
+				];
+			}
+		}
+		else{
+			$result = [
+				'error' => 1,
+				'msg' => '请求失败'
+			];
+		}
+		return json($result);
+	}
+
+    /**
+     * 富文本上传图片
+     */
+    public function layup()
+    {
+
+        if ($this->request->file()) {
+            $config = [
+                'size' => 20 * 1024 * 1024,
+                'ext' => 'jpg,png,jpeg'
+            ];
+            $file = $this->request->file('file');
+            $upload_path = str_replace('\\', '/', ROOT_PATH . 'public/uploads');
+            $info = $file->validate($config)->move($upload_path);
+            if ($info) {
+                $save_path = '/uploads/';
+                $result = [
+                    'code' => 0,
+                    'msg' => '上传成功',
+                    'data' => [
+                        'src' => str_replace('\\', '/', $save_path . $info->getSaveName())
+                    ],
+                ];
+            } else {
+                $result = [
+                    'code' => 1,
+                    'msg' => $file->getError()
+                ];
+            }
+        } else {
+            $result = [
+                'code' => 1,
+                'msg' => '请求失败'
+            ];
+        }
+        return json($result);
+    }
+}

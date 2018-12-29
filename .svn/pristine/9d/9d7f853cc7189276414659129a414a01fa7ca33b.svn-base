@@ -1,0 +1,123 @@
+<?php
+namespace app\admin\controller;
+
+use app\admin\model\Admin as AdminModel;
+use app\admin\model\Role as RoleModel;
+class Administrator extends Controller
+{
+	// 管理员列表
+	public function index()
+	{
+		$model = new AdminModel;
+		$list = $model->allList();
+		return $this->fetch('index', ['list'=>$list]);
+	}
+	// 增加管理员
+	public function add_member()
+	{
+		$model = new AdminModel;
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$v = $model->where('admin_name', $post['admin_name'])->find();
+			if($v){
+				return ['ret'=>0, 'msg'=>'重复的登录账户'];
+			}
+			else{
+				$data['rand_str'] = $this->rand_string();
+				$data['password'] = md5($post['repassword'] . $data['rand_str']);
+				$data['admin_name'] = $post['admin_name'];
+				
+				$r = $model->allowField(true)->save($data);
+				if($r){
+					$this->add_SystemLog('管理员', '增加', $data['admin_name']);
+					return ['ret'=>200, 'msg'=>'操作成功'];
+				}
+				else{
+					return ['ret'=>0, 'msg'=>'操作失败'];
+				}
+			}
+		}
+		else{
+			return $this->fetch();
+		}
+	}
+	// 禁/开管理员
+	public function disabled_admin($id, $status, $beName)
+	{
+		if($this->request->isAjax()){
+			if($id == 1){
+				return ['ret'=>0, 'msg'=>'不能禁用超级管理员'];
+			}
+			else{
+				$model = new AdminModel;
+				$r = $model->save(['status'=>$status], ['id'=>$id]);
+				if($r){
+					$this->add_SystemLog('管理员', $status == 1 ? '开启' : '禁用', $beName);
+					return ['ret'=>200, 'msg'=>'操作成功'];
+				}
+				else{
+					return ['ret'=>0, 'msg'=>'操作失败'];
+				}
+			}
+			
+		}
+	}
+	// 修改管理员/密码
+	public function update_pwd()
+	{
+		$model = new AdminModel;
+		if($this->request->isAjax()){
+			$admin = $this->admin_info;
+			if($admin['id'] != 1){
+				return ['ret'=>0, 'msg'=>'不能修改超级管理员'];
+			}
+			$post = $this->postData();
+			if($post['password'] === $post['repassword']){
+				$v = $model->where('id', '<>', $post['id'])->where('admin_name', $post['admin_name'])->find();
+				if($v){
+					return ['ret'=>0, 'msg'=>'重复的登录账户'];
+				}
+				else{
+					$data['admin_name'] = $post['admin_name'];
+					$data['rand_str'] = $this->rand_string();
+					$data['password'] = md5($post['repassword'] . $data['rand_str']);
+					$r = $model->save($data, ['id'=>$post['id']]);
+					if($r){
+						$contents = $post['admin_name'] === $post['beName'] ? $post['admin_name'] : $post['admin_name']." (".$post['beName'].") ";
+						$this->add_SystemLog('管理员', '修改', $contents);
+						return ['ret'=>200, 'msg'=>'操作成功'];
+					}
+					else{
+						return ['ret'=>0, 'msg'=>'操作失败'];
+					}
+				}
+			}
+			else{
+				return ['ret'=>0, 'msg'=>'两次密码不一致'];
+			}
+		}
+		else{
+			$get = $this->getData();
+			$list = $model->get($get['id']);
+			return $this->fetch('update_pwd', ['list'=>$list]);
+		}
+	}
+	// 设置权限
+	public function assigning_role()
+	{
+		$model = new AdminModel;
+		if($this->request->isAjax()){
+			$post = $this->postData();
+			$model->save(['role_id'=>$post['roleId']], ['id'=>$post['pkid']]);
+			$this->add_SystemLog('管理员', '设置权限', $post['beName']);
+			return ['ret'=>200, 'msg'=>'操作成功'];
+		}
+		else{
+			$roleModel = new RoleModel;
+			$get = $this->getData();
+			$list = $model->get($get['id']);
+			$roleList = $roleModel->all();
+			return $this->fetch('assigning_role', ['list'=>$list, 'roleList'=>$roleList]);
+		}
+	}
+}

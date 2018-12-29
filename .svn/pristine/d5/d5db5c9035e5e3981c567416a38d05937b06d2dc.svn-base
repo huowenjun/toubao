@@ -1,0 +1,172 @@
+<?php
+/**
+ * 产品配置.
+ * User: 霍文俊
+ * Date: 2018/12/14
+ * Time: 15:57
+ */
+
+namespace app\admin\controller;
+
+use app\admin\model\Mel;
+use think\Log;
+use \app\admin\model\Insurance;
+use \app\admin\model\Brand;
+use \app\admin\model\Product as ProductModel;
+use think\Request;
+
+class Product extends Controller
+{
+    public $obj;
+
+    public function __construct(Request $request = null)
+    {
+        parent::__construct($request);
+        $this->obj = new ProductModel();
+
+    }
+
+    /**
+     * 主页列表
+     * @return mixed
+     */
+    public function index()
+    {
+        $where = array();
+        $data = $this->obj->allList($where,PAGE_NUM);
+        return $this->fetch('index',['list'=>$data]);
+    }
+
+    /**
+     * 添加
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function add_product()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();//维修店提交数据
+            $data['ctime']      = time();
+            $data['prices']     = $post['t_price'];
+            $data['num']        = $post['t_num'];
+            $data['condition']  = $post['condition'];
+            $data['i_id']       = $post['i_id'];
+            $data['name']       = $post['name'];
+            $data['price']      = $post['price'];
+            $data['type']       = $post['type'];
+            $data['type_t']     = isset($post['type_3'])?implode(',', $post['type_3']):0;
+            $str                = '';
+            foreach ($post['b_id'] as $k => $v) {
+                $str .= $k . ',' . implode(',', $v) . ';';
+            }
+            $data['b_id'] = $str;
+            $str2         = '';
+            $str3         = '';
+            if ($post['type'] == 3) {
+                for ($i = 1; $i < 4; $i++) {
+                    if (isset($post['p_' . $post['type'] . $i])) {
+                        $str2 .= $post['p_' . $post['type'] . $i] . ',';
+                    }
+                    if (isset($post['num_' . $post['type'] . $i])) {
+                        $str3 .= $post['num_' . $post['type'] . $i] . ',';
+                    }
+                }
+                $data['prices'] = rtrim($str2,',');
+                $data['num']    = rtrim($str3,',');
+            }
+
+            $r = $this->obj->allowField(true)->save($data);
+            if ($r) {
+                $this->add_SystemLog('产品配置', '增加', $post['name']);
+                return ['ret' => 200, 'msg' => '操作成功'];
+            } else {
+                Log::write('产品配置添加失败' . $post['name'] . DATE);
+                return ['ret' => 0, 'msg' => '操作失败'];
+            }
+        } else {
+            $insData        = Insurance::field(['id', 'i_name'])->select();//服务大类
+            $broM           = new Brand();
+            $modelM         = new Mel();
+            $broData        = $broM->brandData();//查询品牌
+            foreach ($broData as $k => $v) {
+                $broData[$k]['child'] = $modelM->melData(['brand_id' => $v['id']]);
+            }
+            $product_type   = config('product_type');//服务条件
+            $type_3         = config('type_3');//组合条件
+            $data = [
+                'insData'     => $insData,
+                'broData'     => $broData,
+                'productType' => $product_type,
+                'type_3'      => $type_3,
+            ];
+            return $this->fetch('add_product', ['data' => $data]);
+        }
+    }
+
+    /**
+     * 删除
+     */
+    public function delete_product()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();
+            $bool = $this->obj->destroy($post['pkid']);
+            if (!$bool) {
+                Log::write('产品配置删除失败' . $post['beName'] . DATE);
+                return ['msg' => '删除失败'];
+            }
+            $this->add_SystemLog('产品配置', '删除', $post['beName']);
+            return ['msg' => '删除成功'];
+        }
+    }
+
+    /**
+     * 修改
+     */
+    public function update_product()
+    {
+        if ($this->request->isAjax()) {
+//            $post = $this->postData();
+//            $post['utime'] = time();
+//            $r = $this->obj->allowField(true)->save($post, ['id' => $post['pkid']]);
+//            if ($r) {
+//                $contents = $post['store_name'] === $post['beName'] ? $post['store_name'] : $post['store_name'] . " (" . $post['beName'] . ") ";
+//                $this->add_SystemLog('维修店', '修改', $contents);
+//                return ['ret' => 200, 'msg' => '操作成功'];
+//            } else {
+//                Log::write('维修店修改失败' . $post['beName'] . DATE);
+//                return ['ret' => 0, 'msg' => '操作失败'];
+//            }
+        } else {
+            $get = $this->getData();
+            $list = $this->obj->get($get['id']);
+            $list['b_id'] = explode(';',rtrim($list['b_id'],';'));
+            $arr = array();
+            foreach ($list['b_id'] as $k=>$v)
+            {
+                array_push($arr,explode(',',$v));
+            }
+            $list['b_id'] = $arr;
+            $insData        = Insurance::field(['id', 'i_name'])->select();//服务大类
+            $broM           = new Brand();
+            $modelM         = new Mel();
+            $broData        = $broM->brandData();//查询品牌
+            foreach ($broData as $k => $v) {
+                $broData[$k]['child'] = $modelM->melData(['brand_id' => $v['id']]);
+            }
+            $product_type   = config('product_type');//服务条件
+            $type_3         = config('type_3');//组合条件
+            $data = [
+                'insData'     => $insData,
+                'broData'     => $broData,
+                'productType' => $product_type,
+                'type_3'      => $type_3,
+                'list'        => $list,
+            ];
+            return $this->fetch('update_product', ['data' => $data]);
+        }
+    }
+
+}

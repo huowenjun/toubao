@@ -1,0 +1,240 @@
+<?php
+/**
+ * 产品配置.
+ * User: 霍文俊
+ * Date: 2018/12/14
+ * Time: 15:57
+ */
+
+namespace app\admin\controller;
+
+use app\admin\model\Mel;
+use think\Log;
+use \app\admin\model\Insurance;
+use \app\admin\model\Brand;
+use \app\admin\model\Product as ProductModel;
+use think\Request;
+
+class Product extends Controller
+{
+    public $obj;
+
+    public function __construct(Request $request = null)
+    {
+        parent::__construct($request);
+        $this->obj = new ProductModel();
+
+    }
+
+    /**
+     * 主页列表
+     * @return mixed
+     */
+    public function index()
+    {
+        $where = array();
+        $get = $this->getData();
+        if (!empty($get['i_id'])) {
+            $where['i_id'] = $get['i_id'];
+        }
+        if (!empty($get['name'])) {
+            $where['name'] = ['like', '%' . $get['name'] . '%'];
+        }
+        $insData = Insurance::field(['id', 'i_name'])->select();//服务大类
+        $data = $this->obj->allList($where, PAGE_NUM, $insData);
+        return $this->fetch('index', ['list' => $data, 'insData' => $insData]);
+    }
+
+    /**
+     * 添加
+     * @return mixed
+     * @throws \think\db\exception\DataNotFoundException
+     * @throws \think\db\exception\ModelNotFoundException
+     * @throws \think\exception\DbException
+     */
+    public function add_product()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();//维修店提交数据
+            $data = $this->dataS($post);
+            $data['ctime'] = time();
+            $r = $this->obj->allowField(true)->save($data);
+            if ($r) {
+                $this->add_SystemLog('产品配置', '增加', $data['name']);
+                return ['ret' => 200, 'msg' => '操作成功'];
+            } else {
+                Log::write('产品配置添加失败' . $data['name'] . DATE);
+                return ['ret' => 0, 'msg' => '操作失败'];
+            }
+        } else {
+            $insData = Insurance::field(['id', 'i_name'])->select();//服务大类
+            $broM = new Brand();
+            $modelM = new Mel();
+            $broData = $broM->brandData();//查询品牌
+            $model = $modelM->field(['id', 'brand_id', 'name'])->select();//查询型号
+            $broData = $this->dataA($broData, $model);
+            $product_type = config('product_type');//服务条件
+            $type_3 = config('type_3');//组合条件
+            $data = [
+                'insData' => $insData,
+                'broData' => $broData,
+                'productType' => $product_type,
+                'type_3' => $type_3,
+            ];
+            return $this->fetch('add_product', ['data' => $data]);
+        }
+    }
+
+    /**
+     * 删除
+     */
+    public function delete_product()
+    {
+        if ($this->request->isAjax()) {
+            $post = $this->postData();
+            $bool = $this->obj->destroy($post['pkid']);
+            if (!$bool) {
+                Log::write('产品配置删除失败' . $post['beName'] . DATE);
+                return ['msg' => '删除失败'];
+            }
+            $this->add_SystemLog('产品配置', '删除', $post['beName']);
+            return ['msg' => '删除成功'];
+        }
+    }
+
+    /**
+     * 修改
+     */
+    public function update_product()
+    {
+        if ($this->request->isAjax()) {
+            $data = $this->postData();
+            $pkid = $data['pkid'];
+            $beName = $data['beName'];
+            $post = $this->dataS($data);
+            $post['utime'] = time();
+            $post['pkid'] = $pkid;
+            $post['beName'] = $beName;
+            $r = $this->obj->allowField(true)->save($post, ['id' => $post['pkid']]);
+            if ($r) {
+                $contents = $post['name'] === $post['beName'] ? $post['name'] : $post['name'] . " (" . $post['beName'] . ") ";
+                $this->add_SystemLog('产品配置', '修改', $contents);
+                return ['ret' => 200, 'msg' => '操作成功'];
+            } else {
+                Log::write('维修店修改失败' . $post['beName'] . DATE);
+                return ['ret' => 0, 'msg' => '操作失败'];
+            }
+        } else {
+            $get = $this->getData();
+            $list = $this->obj->get($get['id']);
+            $list = $this->dataU($list);
+            $insData = Insurance::field(['id', 'i_name'])->select();//服务大类
+            $broM = new Brand();
+            $modelM = new Mel();
+            $broData = $broM->brandData();//查询品牌
+            $model = $modelM->field(['id', 'brand_id', 'name'])->select();//查询型号
+            $broData = $this->dataA($broData, $model);
+            $product_type = config('product_type');//服务条件
+            $type_3 = config('type_3');//组合条件
+            $data = [
+                'insData' => $insData,
+                'broData' => $broData,
+                'productType' => $product_type,
+                'type_3' => $type_3,
+                'list' => $list,
+            ];
+            return $this->fetch('update_product', ['data' => $data]);
+        }
+    }
+
+    private function dataS($post)
+    {
+        $data['prices'] = $post['t_price'] ? $post['t_price'] : 0;
+        $data['num'] = $post['t_num'] ? $post['t_num'] : 0;
+        $data['condition'] = $post['condition'];
+        $data['i_id'] = $post['i_id'];
+        $data['name'] = $post['name'];
+        $data['price'] = $post['price'];
+        $data['type'] = $post['type'];
+        $data['code'] = $post['code'];
+        $data['sixm'] = $post['sixm'];
+        $data['ninem'] =$post['ninem'];
+        $data['twelvem'] =$post['twelvem'];
+        $data['type_t'] = isset($post['type_3']) ? implode(',', $post['type_3']) : 0;
+        $str = '';
+        foreach ($post['b_id'] as $k => $v) {
+            $str .= $k . ',' . implode(',', $v) . ';';
+        }
+        $data['b_id'] = $str;
+        $str2 = '';
+        $str3 = '';
+        if ($post['type'] == 3) {
+            for ($i = 1; $i < 4; $i++) {
+                if (isset($post['p_' . $post['type'] . $i])) {
+                    $str2 .= $post['p_' . $post['type'] . $i] . ',';
+                }
+                if (isset($post['num_' . $post['type'] . $i])) {
+                    $str3 .= $post['num_' . $post['type'] . $i] . ',';
+                }
+            }
+            $data['prices'] = rtrim($str2, ',');
+            $data['num'] = rtrim($str3, ',');
+        }
+
+        return $data;
+    }
+
+    private function dataU($list = array())
+    {
+        //start处理手机型号
+        $list['b_id'] = explode(';', rtrim($list['b_id'], ';'));
+        $str = '';
+        foreach ($list['b_id'] as $v) {
+            $be = explode(',', $v);
+            unset($be[0]);
+            if (count($be) == 1) {
+                $str .= $be[1] . ',';
+            } else {
+                $str .= implode(',', $be) . ',';
+            }
+        }
+        $str = trim($str, ',');
+        $list['b_id'] = explode(',', $str);
+        //end
+        //start 处理服务条件
+        $list['type_t'] = explode(',', $list['type_t']);
+        //end
+        //start 处理num&&prices
+        if ($list['type'] == 3) {
+            $list['num'] = explode(',', $list['num']);
+            $list['prices'] = explode(',', $list['prices']);
+            $nArr = $pArr = array();
+            foreach ($list['num'] as $key => $value) {
+                $nArr[$list['type_t'][$key]] = $value;
+            }
+            foreach ($list['prices'] as $key => $value) {
+                $pArr[$list['type_t'][$key]] = $value;
+            }
+            $list['num'] = $nArr;
+            $list['prices'] = $pArr;
+        }
+        //end
+        return $list;
+    }
+
+    private function dataA($broData = array(), $model = array())
+    {
+
+        foreach ($broData as $key => $values) {
+            $arr = array();
+            foreach ($model as $k => $v) {
+                if ($v['brand_id'] == $values['id']) {
+                    $arr[] = $v;
+                }
+            }
+            $broData[$key]['child'] = $arr;
+        }
+        return $broData;
+    }
+
+}

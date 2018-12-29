@@ -1,0 +1,101 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>成员列表</legend>
+		<?php if(in_array(10, $role_operation_ids)): ?>
+		<div style="text-align: left;">
+			<a href="addmember.html" class="layui-btn layui-btn-sm layui-btn-normal">增加成员</a>
+		</div>
+		<?php endif; ?>
+	</fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+	<table class="layui-table" >
+		<colgroup>
+			<col width="140">
+			<col width="160">
+			<col width="180">
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>昵称</th>
+				<th>成员 ID</th>
+				<th>上次登录时间</th>
+				<th>登录 IP</th>
+				<th>状态</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php if (!(empty($list->total()))): foreach ($list as $vo): ?>
+		<tr>
+			<td><?php echo $vo['admin_name']; ?></td>
+			<td><?php echo $vo['nickname']; ?></td>
+			<td><?php echo $vo['last_time'] ? date('Y-m-d H:s:i', $vo['last_time']) : ''; ?></td>
+			<td><?php echo $vo['ip']; ?></td>
+			<td><?php if($vo['status'] == '1'): ?>正常<?php else: ?>禁用中<?php endif; ?></td>
+			<td>
+			<?php if($vo['id'] == 1): ?>
+				<?php if($admin_info['id'] == 1): ?>
+					<?php if($vo['status'] == '1'): ?>
+						<a class="rha-bt-a" onclick="disabledAdmin('<?php echo $vo['id']; ?>', '0', '<?php echo $vo['admin_name']; ?>')" href="javascript:;">禁用</a>
+					<?php else: ?>
+						<a class="rha-bt-a" onclick="disabledAdmin('<?php echo $vo['id']; ?>', '1', '<?php echo $vo['admin_name']; ?>')" href="javascript:;">开启</a>
+					<?php endif; ?>
+					<a class="rha-bt-a" href="updateAdminPwd.html?id=<?php echo $vo['id']; ?>">修改</a>
+				<?php endif; ?>
+			<?php else: ?>
+				<?php if(in_array(12, $role_operation_ids)): ?>
+					<?php if($vo['status'] == '1'): ?>
+						<a class="rha-bt-a" onclick="disabledAdmin('<?php echo $vo['id']; ?>', '0', '<?php echo $vo['admin_name']; ?>')" href="javascript:;">禁用</a>
+					<?php else: ?>
+						<a class="rha-bt-a" onclick="disabledAdmin('<?php echo $vo['id']; ?>', '1', '<?php echo $vo['admin_name']; ?>')" href="javascript:;">开启</a>
+					<?php endif; ?>
+				<?php endif; ?>
+				<?php if(in_array(13, $role_operation_ids)): ?>
+					<a class="rha-bt-a" href="updateAdminPwd.html?id=<?php echo $vo['id']; ?>">修改</a>
+				<?php endif; ?>
+				<?php if(in_array(33, $role_operation_ids)): ?>
+					<a class="rha-bt-a" href="AssRole.html?id=<?php echo $vo['id']; ?>">设置权限</a>
+				<?php endif; ?>
+			<?php endif; ?>
+			</td>
+		</tr>
+		<?php endforeach; else: ?>
+		<tr>
+			<td colspan="6">暂无记录</td>
+		</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+	<?php if (!(empty($list))): ?>
+		<div style="text-align: left;"><?php echo $list->render(); ?></div>
+	<?php endif; ?>
+</div>
+<script>
+function disabledAdmin(id, status, beName) {
+	var txt = status == 1 ? '开启' : '禁用';
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		layer.confirm('你确定需要'+ txt +'吗？', {
+			btn: ['是','不'] //按钮
+		}, function(){
+			$.post(
+				'disabledAdmin',
+				{'id':id, 'status':status, 'beName':beName},
+				function(obj){
+					if(obj.ret == 200){
+						layer.msg(obj.msg, {time: 1500}, function(){
+							window.location.reload();
+						});
+					}
+					else{
+						layer.msg(obj.msg, {time: 1500, anim: 6});
+					}
+				},
+				"json"
+			);
+		});
+	});
+}
+</script>

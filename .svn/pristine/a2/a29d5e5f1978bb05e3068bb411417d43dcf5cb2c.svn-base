@@ -1,0 +1,25 @@
+<?php
+namespace app\admin\model;
+
+use think\Model;
+use think\Request;
+use traits\model\SoftDelete;
+class Store extends Model
+{
+	protected $name = 'store';
+	protected $pk = 'id';
+    use SoftDelete;
+    protected $deleteTime = 'delete_time';
+	public function allList($where = array(), $page = false)
+	{
+		$data = $this
+            ->field(['id','store_name','store_address','store_code','name','tel','ctime'])
+            ->order('id DESC')
+			->where($where)
+			->paginate($page, false, [
+                'query' => Request::instance()->request()
+            ]);
+		return $data;
+	}
+
+}

@@ -1,0 +1,67 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>更改管理员密码</legend>
+	</fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+	<form class="layui-form layui-form-pane" action="" lay-filter="example">
+	<input type="hidden" name="id" value="<?php echo $list['id']; ?>">
+	<input type="hidden" name="beName" value="<?php echo $list['admin_name']; ?>">
+		<div class="layui-form-item">
+			<div class="layui-inline">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i class="required-color">*</i>账号昵称</label>
+					<div class="layui-input-block">
+						<input name="nickname" required="" lay-verify="required" placeholder="请输入账号昵称" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['nickname']; ?>">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i class="required-color">*</i>登录账号</label>
+					<div class="layui-input-block">
+						<input name="admin_name" required="" lay-verify="required" placeholder="请输入登录账号" autocomplete="off" class="layui-input" type="text" value="<?php echo $list['admin_name']; ?>">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i class="required-color">*</i>更改密码</label>
+					<div class="layui-input-inline">
+						<input name="password" required="" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input" type="password">
+					</div>
+					<div class="layui-form-mid layui-word-aux">建议使用复杂一些的密码</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i class="required-color">*</i>重复密码</label>
+					<div class="layui-input-inline">
+						<input name="repassword" required="" lay-verify="required" placeholder="请输入密码" autocomplete="off" class="layui-input" type="password">
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-input-block">
+					<button class="layui-btn" lay-submit="" lay-filter="updatepwd">确认更改</button>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<script>
+    layui.use('form', function () {
+        var form = layui.form;
+        form.on('submit(updatepwd)', function (data) {
+			$.post(
+				'updateAdminPwd',
+				data.field,
+				function(obj){
+					if(obj.ret == 200){
+						layer.msg(obj.msg, {time: 1500}, function(){
+							window.location.reload();
+						});
+					}
+					else{
+						layer.msg(obj.msg, {time: 1500, anim: 6});
+					}
+				}
+			);
+            return false;
+        });
+    });
+</script>
