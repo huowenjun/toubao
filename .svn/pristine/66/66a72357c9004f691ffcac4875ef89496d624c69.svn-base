@@ -1,0 +1,100 @@
+<div class="content-hd">
+	<fieldset class="layui-elem-field layui-field-title" >
+		<legend>投保单列表</legend>
+		<div style="text-align: left; ">
+			
+		</div>
+
+	</fieldset>
+
+
+
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+
+	<table class="layui-table" >
+		<colgroup>
+			<col width="80">
+			<col width="100">
+			<col width="105">
+			<col width="90">
+			<col width="105">
+			<col width="110">
+			<col width="100">
+			<col width="110">
+			<col width="110">
+			<col width="90">
+			<col width="120">
+			<col>
+		</colgroup>
+		<thead>
+			<tr>
+				<th>受益人</th>
+				<th>手机号</th>
+				<th>型号</th>
+				<th>IMEI1</th>
+				<th>激活/购买日期</th>
+				<th>服务内容</th>
+				<th>服务开始日期</th>
+				<th>服务结束日期</th>
+				<th>授权码</th>
+				<th>操作</th>
+			</tr>
+		</thead>
+		<tbody>
+		<?php if (!(empty($list->total()))): foreach ($list as $vo): ?>
+		<tr>
+			<td><?php echo $vo['u_name']; ?></td>
+			<td><?php echo $vo['u_tel']; ?></td>
+			<td><?php echo $vo['t_mod']; ?></td>
+			<td><?php echo $vo['t_imei_one']; ?></td>
+			<td><?php echo $vo['t_time'] ? date("y-m-d H:i", $vo['t_time']) : ''; ?></td>
+			<td><?php echo $vo['name']; ?></td>
+			<td><?php echo $vo['insure_start_time'] ? date("y-m-d H:i", $vo['insure_start_time']) : ''; ?></td>
+			<td><?php echo $vo['insure_end_time'] ? date("y-m-d H:i", $vo['insure_end_time']) : ''; ?></td>
+			<td><?php echo $vo['acode']?></td>
+			<td>
+				<?php if(in_array(88, $role_operation_ids)): ?>
+				<a class="rha-bt-a" href="updateInsure.html?id=<?php echo $vo['id']; ?>">修改</a><br>
+				<?php endif; ?>
+				<?php if(in_array(89, $role_operation_ids)): ?>
+				<a href="javascript:;" onclick="Del('<?php echo $vo['id']; ?>', '<?php echo $vo['name']; ?>')" class="rha-bt-a" >删除</a><br>
+				<?php endif; ?>
+				<?php if(in_array(87, $role_operation_ids)): ?>
+				<a class="rha-bt-a" href="showInsure.html?id=<?php echo $vo['id']; ?>">详情</a><br>
+				<?php endif; ?>
+			</td>
+		</tr>
+		<?php endforeach; else: ?>
+		<tr>
+			<td colspan="10">暂无记录</td>
+		</tr>
+		<?php endif; ?>
+		</tbody>
+	</table>
+	<?php if (!(empty($list))): ?>
+	<div style="text-align: left;"><?php echo $list->render(); ?></div>
+	<?php endif; ?>
+</div>
+<script>
+function Del(pkid, beName)
+{
+	layui.use('layer', function(){
+		var layer = layui.layer;
+		layer.confirm('你确定要删除吗？', {
+			btn: ['是','不'] //按钮
+		}, function(){
+			$.post(
+				'delInsure',
+				{'pkid':pkid, 'beName':beName},
+				function(obj){
+					layer.msg(obj.msg, {time: 1500}, function(){
+						window.location.reload();
+					});
+				},
+				"json"
+			);
+		});
+	});
+}
+</script>

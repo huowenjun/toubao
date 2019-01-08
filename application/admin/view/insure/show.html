@@ -1,0 +1,119 @@
+<div class="content-hd">
+    <fieldset class="layui-elem-field layui-field-title" >
+        <legend>投保详情</legend>
+    </fieldset>
+</div>
+<div class="rhaphp-srivice-register">
+    <div class="layui-form-item">
+        <label class="layui-form-label">激活订单号:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['order']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">保险号:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['card']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">受益人:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['u_name']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">性别:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['u_sex']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" title="证件类型（身份证、军官证、护照）">证件类:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['card_type']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">证件号码:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['u_cardid']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机号:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['u_tel']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">职业:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['u_job']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">购买地址:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{$data['buy_address']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">设备品牌:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_brand']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">设备型号:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_mod']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">设备颜色:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_col']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">内存容量:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_mem']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">IMEI1:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_imei_one']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">IMEI2:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_imei_two']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">SN:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['t_sn']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" title="激活/购买日期">激活/购买日:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{$data['t_time']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 上传资料:</label>
+        <div class="layui-input-inline">
+        {foreach $data['photo'] as $v}
+            <img src="{$v}" alt="" width="500px" height="300px"><hr>
+        {/foreach}
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" title="服务内容"> 服务内容:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['name']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 保障天数:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['guarantee_time']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: auto"> 服务开始日期:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{$data['insure_start_time']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label" style="width: auto"> 服务结束日期:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{$data['insure_end_time']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 授权码:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['acode']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 提交日期:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{$data['submission_time']}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 审核日期:</label>
+        <label class="layui-form-label" style="text-align: left;width: auto">{if condition=" $data['examine_admin'] == ''"} 无 {else /}{$data['examine_time']}{/if}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 审核人:</label>
+        <label class="layui-form-label" style="text-align: left">{if condition=" $data['examine_admin'] == ''"} 无 {else /}{$data['examine_admin']}{/if}</label>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"> 审核状态:</label>
+        <label class="layui-form-label" style="text-align: left">{$data['order_status']}</label>
+    </div>
+</div>
