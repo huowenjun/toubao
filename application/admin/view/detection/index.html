@@ -1,0 +1,95 @@
+<div class="content-hd">
+    <fieldset class="layui-elem-field layui-field-title">
+        <legend>投保单列表</legend>
+    </fieldset>
+</div>
+<div style="padding: 0px 10px 0px 10px;">
+
+    <table class="layui-table">
+        <colgroup>
+            <col width="80">
+            <col width="110">
+            <col width="70">
+            <col width="100">
+            <col width="110">
+            <col width="100">
+            <col width="110">
+            <col width="110">
+            <col width="90">
+            <col width="90">
+            <col width="120">
+        </colgroup>
+        <thead>
+        <tr>
+            <th>受益人</th>
+            <th>手机号</th>
+            <th>型号</th>
+            <th>IMEI1</th>
+            <th title="激活/购买日期">购买日期</th>
+            <th>服务内容</th>
+            <th title="服务开始日期">开始日期</th>
+            <th title="服务结束日期">结束日期</th>
+            <th title="剩余保障天数">剩余保障</th>
+            <th>旧件审核</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <?php if (!(empty($list->total()))): foreach ($list as $vo): ?>
+        <tr>
+            <td><?php echo $vo['u_name']; ?></td>
+            <td><?php echo $vo['u_tel']; ?></td>
+            <td><?php echo $vo['t_mod']; ?></td>
+            <td><?php echo $vo['t_imei_one']; ?></td>
+            <td><?php echo $vo['t_time']; ?></td>
+            <td><?php echo $vo['name']; ?></td>
+            <td><?php echo $vo['server_start_time']; ?></td>
+            <td><?php echo $vo['server_end_time']; ?></td>
+            <td><?php echo $vo['surplus_date']?></td>
+            <td><?php echo $vo['old_part_status']?></td>
+            <td>
+                <?php if(in_array(101, $role_operation_ids)): ?>
+                <a class="rha-bt-a" href="updateDetection.html?id=<?php echo $vo['id']; ?>">修改</a><br>
+                <?php endif; ?>
+                <?php if(in_array(102, $role_operation_ids)): ?>
+                <a href="javascript:javascript:void(0);" onclick="Del('<?php echo $vo['id']; ?>', '<?php echo $vo['u_name']; ?>')"
+                   class="rha-bt-a">删除</a><br>
+                <?php endif; ?>
+                <?php if(in_array(100, $role_operation_ids)): ?>
+                <a class="rha-bt-a" href="detectionShow.html?id=<?php echo $vo['id']; ?>">详情</a><br>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <?php endforeach; else: ?>
+        <tr>
+            <td colspan="11">暂无记录</td>
+        </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+    <?php if (!(empty($list))): ?>
+    <div style="text-align: left;"><?php echo $list->render(); ?></div>
+    <?php endif; ?>
+</div>
+<script>
+    function Del(pkid, beName) {
+        layui.use('layer', function () {
+            var layer = layui.layer;
+            layer.confirm('你确定要删除受益人为'+beName+'的保单吗？', {
+                btn: ['是', '不'] //按钮
+            }, function () {
+                $.post(
+                    'deleteDetection',
+                    {'pkid': pkid, 'beName': beName},
+                    function (obj) {
+                        console.log(obj);
+                        layer.msg(obj.msg, {time: 1500}, function () {
+                            window.location.reload();
+                        });
+                    },
+                    "json"
+                );
+            });
+        });
+    }
+</script>

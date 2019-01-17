@@ -1,6 +1,6 @@
 <div class="content-hd">
     <fieldset class="layui-elem-field layui-field-title" >
-        <legend>投保详情</legend>
+        <legend>检测单详情</legend>
     </fieldset>
 </div>
 <style>
@@ -21,14 +21,6 @@
         </ul>
         <div class="layui-tab-content" style="height: auto;">
             <div class="layui-tab-item layui-show wk">
-                <div class="layui-form-item">
-                    <label class="layui-form-label" style="width:auto;">激活订单号:</label>
-                    <label class="layui-form-label" style="text-align: left">{$data['order']}</label>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">保险号:</label>
-                    <label class="layui-form-label" style="text-align: left">{$data['card']}</label>
-                </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label">受益人:</label>
                     <label class="layui-form-label" style="text-align: left">{$data['u_name']}</label>
@@ -56,6 +48,18 @@
                 <div class="layui-form-item">
                     <label class="layui-form-label">购买地址:</label>
                     <label class="layui-form-label" style="text-align: left;width: auto">{$data['buy_address']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">快递公司:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['express_company']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">快递单号:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['express_num']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">联系地址:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['contact_address']}</label>
                 </div>
             </div>
             <div class="layui-tab-item wk">
@@ -88,54 +92,92 @@
                     <label class="layui-form-label" style="text-align: left">{$data['t_sn']}</label>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label" title="激活/购买日期" style="width:auto;">激活/购买日:</label>
+                    <label class="layui-form-label" title="激活/购买日期" style="width: auto;">激活/购买日:</label>
                     <label class="layui-form-label" style="text-align: left;width: auto">{$data['t_time']}</label>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label" title="损坏经过">损坏经过:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['damage']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="设备权益"> 设备权益:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['t_equity']}</label>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label"> 上传资料:</label>
-                    <label class="layui-form-label" style="text-align: left;width: auto">
+                    <label class="layui-form-label" style="text-align: left">
+                    <!--<div class="layui-input-inline">-->
                         {foreach $data['photo'] as $v}
-                        <img src="{$v}" alt="" width="300px" height="150px">
+                        <img src="{$v}" alt="" width="300px" height="150px" style="margin-bottom: 10px">
                         {/foreach}
+                    <!--</div>-->
                     </label>
                 </div>
             </div>
             <div class="layui-tab-item wk">
                 <div class="layui-form-item">
-                    <label class="layui-form-label" title="服务内容"> 服务内容:</label>
-                    <label class="layui-form-label" style="text-align: left">{$data['name']}</label>
-                </div>
+                <label class="layui-form-label" title="服务内容"> 服务内容:</label>
+                <label class="layui-form-label" style="text-align: left">{$data['name']}</label>
+            </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label"> 保障天数:</label>
                     <label class="layui-form-label" style="text-align: left">{$data['guarantee_time']}</label>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label" style="width: auto"> 服务开始日期:</label>
-                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['insure_start_time']}</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['server_start_time']}</label>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label" style="width: auto"> 服务结束日期:</label>
-                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['insure_end_time']}</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['server_end_time']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" style="width: auto" title="剩余保障天数"> 剩余保障天数:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['surplus_date']}</label>
                 </div>
                 <div class="layui-form-item">
                     <label class="layui-form-label"> 授权码:</label>
                     <label class="layui-form-label" style="text-align: left">{$data['acode']}</label>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label"> 提交日期:</label>
-                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['submission_time']}</label>
+                    <label class="layui-form-label" title="销售门店名称">门店名称:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['store_name']}</label>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label"> 审核日期:</label>
-                    <label class="layui-form-label" style="text-align: left;width: auto">{if condition=" $data['examine_admin'] == ''"} 无 {else /}{$data['examine_time']}{/if}</label>
+                    <label class="layui-form-label" title="销售门店地址">门店地址:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['store_address']}</label>
                 </div>
                 <div class="layui-form-item">
-                    <label class="layui-form-label"> 审核人:</label>
-                    <label class="layui-form-label" style="text-align: left">{if condition=" $data['examine_admin'] == ''"} 无 {else /}{$data['examine_admin']}{/if}</label>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label"> 审核状态:</label>
+                    <label class="layui-form-label"> 订单状态:</label>
                     <label class="layui-form-label" style="text-align: left">{$data['order_status']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="出险提交日期">提交日期:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['report_time']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="产品出库金额">出库金额:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['pro_price']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="操作人">操作人:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['operator']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="操作日期">操作日期:</label>
+                    <label class="layui-form-label" style="text-align: left;width: auto">{$data['operator_time']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="设备状态">设备状态:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['t_status']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="接收人">接收人:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['recipient']}</label>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label" title="旧件审核">旧件审核:</label>
+                    <label class="layui-form-label" style="text-align: left">{$data['old_part_status']}</label>
                 </div>
             </div>
         </div>

@@ -104,12 +104,3 @@ Route::rule('detection', 'admin/detection/index');//检测单列表
 Route::rule('detectionShow', 'admin/detection/show');//检测单详情
 Route::rule('updateDetection', 'admin/detection/up_detection');//检测单修改
 Route::rule('deleteDetection', 'admin/detection/del_detection');//检测单删除
-
-/**
- * HWJ
- * @维修单
- */
-Route::rule('index', 'admin/maintain/index');//维修单列表
-Route::rule('show', 'admin/maintain/show');//维修单详情
-Route::rule('edit', 'admin/maintain/edit');//维修单修改
-Route::rule('del', 'admin/maintain/del');//维修单删除
